@@ -1,0 +1,15 @@
+{
+  "name": "time-aggregation-notifier",
+  "description": "Time aggregation notifier with Redmine",
+  "region": "ap-northeast-1",
+  "runtime": "python3.7",
+  "handler": "main.lambda_handler",
+  "role": "arn:aws:iam::XXXXXXXX:role/XXX",
+  "timeout": 300,
+  "memory": 128,
+  "ignore": ["README.md", ".pep8", ".env", ".gitignore", "lambda.json.example"],
+  "variables": {
+    "REDMINE_URL": "https://example.com/redmine",
+    "NOTIFY_EMAIL": "hoge@example.com"
+  }
+}

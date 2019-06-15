@@ -1,0 +1,20 @@
+# General
+.DS_Store
+
+# Editor
+.idea
+.vscode
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.env
+.venv
+
+# Lambda config
+event.json
+lambda.json
+lambda_function.zip
