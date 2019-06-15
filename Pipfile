@@ -10,10 +10,11 @@ lambda-uploader = "*"
 
 [packages]
 boto3 = "*"
+requests = "*"
 
 [requires]
 python_version = "3.7"
 
 [scripts]
 execute = "python-lambda-local -f lambda_handler main.py event.json"
-deploy = "lambda-uploader"
+deploy = "lambda-uploader ./"
