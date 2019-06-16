@@ -19,6 +19,6 @@
     "REDMINE_URL": "https://example.com/redmine",
     "REDMINE_KEY": "key",
     "REDMINE_PROJECT": "project",
-    "NOTIFY_EMAIL": "hoge@example.com"
+    "SNS_TOPIC_ARN": "arn:aws:sns:region:XXXXXXXXXXXX:name"
   }
 }

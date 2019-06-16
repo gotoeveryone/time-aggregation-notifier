@@ -1,6 +1,8 @@
 import datetime
 import os
+from urllib.parse import urljoin
 import requests
+import boto3
 
 
 def get_redmine_data(url: str, params: dict):
@@ -16,7 +18,7 @@ def get_client_time_entries(issues: dict):
         'issue_id': ','.join(map(str, issues.keys())),
         'status_id': '*',
     }
-    url = os.path.join(os.environ.get('REDMINE_URL'), 'issues.json')
+    url = urljoin(os.environ.get('REDMINE_URL'), 'issues.json')
     data = get_redmine_data(url, params)
     page = data['total_count'] // data['limit'] + 1
     clients = {}
@@ -43,7 +45,7 @@ def get_issue_time_entries(start: datetime.datetime, end: datetime.datetime):
         'from': start.strftime('%Y-%m-%d'),
         'to': end.strftime('%Y-%m-%d')
     }
-    url = os.path.join(os.environ.get('REDMINE_URL'), 'time_entries.json')
+    url = urljoin(os.environ.get('REDMINE_URL'), 'time_entries.json')
     data = get_redmine_data(url, params)
     page = data['total_count'] // data['limit'] + 1
     issues = {}
@@ -72,5 +74,17 @@ def lambda_handler(event, context):
 
     issues = get_issue_time_entries(start, end)
     clients = get_client_time_entries(issues)
+
+    messages = []
+    for name, hours in clients:
+        messages.append('{name}: {hours}h'.format(name=name, hours=hours))
+
+    # SNS へ連携
+    sns_client = boto3.client('sns')
+    sns_client.publish(
+        TopicArn=os.environ.get('SNS_TOPIC_ARN'),
+        Subject='集計結果',
+        Message='\n'.join(messages),
+    )
 
     return clients
