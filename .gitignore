@@ -14,7 +14,11 @@ __pycache__/
 .env
 .venv
 
+# requirements.txt
+requirements.txt
+
 # Lambda config
 event.json
 lambda.json
 lambda_function.zip
+.lambda_uploader_temp

@@ -20,5 +20,6 @@ $ pipenv run execute
 ## Deploy
 
 ```console
+$ pipenv lock -r > requirements.txt
 $ pipenv run deploy
 ```

@@ -7,9 +7,18 @@
   "role": "arn:aws:iam::XXXXXXXX:role/XXX",
   "timeout": 300,
   "memory": 128,
-  "ignore": ["README.md", ".pep8", ".env", ".gitignore", "lambda.json.example"],
+  "ignore": [
+    ".git$",
+    "^README.md$",
+    ".pep8$",
+    ".env",
+    ".gitignore$",
+    "lambda.json"
+  ],
   "variables": {
     "REDMINE_URL": "https://example.com/redmine",
+    "REDMINE_KEY": "key",
+    "REDMINE_PROJECT": "project",
     "NOTIFY_EMAIL": "hoge@example.com"
   }
 }
