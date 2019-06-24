@@ -5,16 +5,15 @@ verify_ssl = true
 
 [dev-packages]
 autopep8 = "*"
-python-lambda-local = "==0.1.7"
-lambda-uploader = "*"
 
 [packages]
 boto3 = "*"
 requests = "*"
+chalice = "*"
 
 [requires]
 python_version = "3.7"
 
 [scripts]
-execute = "python-lambda-local -f lambda_handler main.py event.json"
-deploy = "lambda-uploader ./"
+execute = "python main.py"
+deploy = "bash -c 'pipenv lock -r > requirements.txt && chalice deploy --stage prod'"

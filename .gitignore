@@ -22,6 +22,9 @@ requirements.txt
 
 # Lambda config
 event.json
-lambda.json
-lambda_function.zip
-.lambda_uploader_temp
+
+# chalice
+.chalice/config.json
+.chalice/deployed/
+.chalice/deployments/
+.chalice/venv/

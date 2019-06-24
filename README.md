@@ -9,6 +9,8 @@
 
 ```console
 $ pipenv install # When with dev-package add `-d` option.
+$ cp .env.example .env # Please edit the value.
+$ cp event.json.example event.json # Please edit the value.
 ```
 
 ## Run (Local)
@@ -20,6 +22,6 @@ $ pipenv run execute
 ## Deploy
 
 ```console
-$ pipenv lock -r > requirements.txt
+$ cp .chalice/config.json.example .chalice/config.json # Please edit the value.
 $ pipenv run deploy
 ```
