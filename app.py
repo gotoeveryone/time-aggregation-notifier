@@ -69,18 +69,23 @@ def get_issue_time_entries(start: datetime.datetime, end: datetime.datetime):
     return issues
 
 
-@app.schedule(Cron(0, 20, '?', '*', 'SUN', '*'))
+@app.schedule(Cron(0, 0, '?', '*', 'MON', '*'))
 def lambda_handler(event, context={}):
     # 集計開始日・終了日を決定
-    end = datetime.datetime.today().astimezone(datetime.timezone(datetime.timedelta(hours=9), name='JST'))
+    today = datetime.datetime.today()
+    end = today - datetime.timedelta(days=1)
     if os.environ.get('START_DATE'):
         end = datetime.datetime.strptime(os.environ.get('START_DATE'), '%Y-%m-%d')
-    start = end - datetime.timedelta(days=int(os.environ.get('BACK_DATE', 7)))
+    start = end - datetime.timedelta(days=int(os.environ.get('BACK_DATE', 6)))
 
     issues = get_issue_time_entries(start, end)
     clients = get_client_time_entries(issues)
 
-    messages = []
+    period_message = '集計期間: {start}～{end}'.format(
+        start=start.strftime('%Y-%m-%d'),
+        end=end.strftime('%Y-%m-%d'),
+    )
+    messages = [period_message, '']
     for name, hours in clients:
         messages.append('{name}: {hours}h'.format(name=name, hours=hours))
 
@@ -90,7 +95,7 @@ def lambda_handler(event, context={}):
         sns_client = boto3.client('sns')
         sns_client.publish(
             TopicArn=os.environ.get('SNS_TOPIC_ARN'),
-            Subject='集計結果',
+            Subject='【自動通知】{date}_稼働時間集計'.format(date=today.strftime('%Y%m%d')),
             Message=message,
         )
 

@@ -9,6 +9,7 @@
       "manage_iam_role": false,
       "iam_role_arn": "arn:aws:iam::XXXXXXXX:role/XXX",
       "environment_variables": {
+        "TZ": "Asia/Tokyo",
         "REDMINE_URL": "https://example.com/redmine",
         "REDMINE_KEY": "key",
         "REDMINE_PROJECT": "project",
