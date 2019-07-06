@@ -73,9 +73,12 @@ def get_issue_time_entries(start: datetime.datetime, end: datetime.datetime):
 def lambda_handler(event, context={}):
     # 集計開始日・終了日を決定
     today = datetime.datetime.today()
-    end = today - datetime.timedelta(days=1)
-    if os.environ.get('START_DATE'):
-        end = datetime.datetime.strptime(os.environ.get('START_DATE'), '%Y-%m-%d')
+    base_date = today
+    if os.environ.get('BASE_DATE'):
+        base_date = datetime.datetime.strptime(os.environ.get('BASE_DATE'), '%Y-%m-%d')
+
+    # 基準日前日から BACK_DATE に設定した日数戻った日付までの期間を集計対象とする
+    end = base_date - datetime.timedelta(days=1)
     start = end - datetime.timedelta(days=int(os.environ.get('BACK_DATE', 6)))
 
     issues = get_issue_time_entries(start, end)
@@ -86,8 +89,12 @@ def lambda_handler(event, context={}):
         end=end.strftime('%Y-%m-%d'),
     )
     messages = [period_message, '']
+    total = 0
     for name, hours in clients:
         messages.append('{name}: {hours}h'.format(name=name, hours=hours))
+        total += hours
+
+    messages.append('合計: {hours}h'.format(hours=total))
 
     message = '\n'.join(messages)
     if not app.debug:
@@ -98,5 +105,7 @@ def lambda_handler(event, context={}):
             Subject='【自動通知】{date}_稼働時間集計'.format(date=today.strftime('%Y%m%d')),
             Message=message,
         )
+    else:
+        app.log.info(message)
 
     return clients
