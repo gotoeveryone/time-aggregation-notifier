@@ -6,7 +6,7 @@ from chalice import Chalice, Cron
 import requests
 
 app = Chalice(app_name='time-aggregation-notifier')
-app.debug = True if os.environ.get('DEBUG', False) else False
+app.debug = True if os.getenv('DEBUG', False) else False
 
 
 def get_redmine_data(url: str, params: dict):
@@ -18,11 +18,11 @@ def get_redmine_data(url: str, params: dict):
 def get_client_time_entries(issues: dict):
     """ Issue 一覧から該当するクライアント単位の作業時間を取得 """
     params = {
-        'key': os.environ.get('REDMINE_KEY'),
+        'key': os.getenv('REDMINE_KEY'),
         'issue_id': ','.join(map(str, issues.keys())),
         'status_id': '*',
     }
-    url = urljoin(os.environ.get('REDMINE_URL'), 'issues.json')
+    url = urljoin(os.getenv('REDMINE_URL'), 'issues.json')
     data = get_redmine_data(url, params)
     page = data['total_count'] // data['limit'] + 1
     clients = {}
@@ -44,12 +44,12 @@ def get_client_time_entries(issues: dict):
 def get_issue_time_entries(start: datetime.datetime, end: datetime.datetime):
     """ Issue 単位の作業時間を取得 """
     params = {
-        'key': os.environ.get('REDMINE_KEY'),
-        'project': os.environ.get('REDMINE_PROJECT'),
+        'key': os.getenv('REDMINE_KEY'),
+        'project': os.getenv('REDMINE_PROJECT'),
         'from': start.strftime('%Y-%m-%d'),
         'to': end.strftime('%Y-%m-%d')
     }
-    url = urljoin(os.environ.get('REDMINE_URL'), 'time_entries.json')
+    url = urljoin(os.getenv('REDMINE_URL'), 'time_entries.json')
     data = get_redmine_data(url, params)
     page = data['total_count'] // data['limit'] + 1
     issues = {}
@@ -69,26 +69,51 @@ def get_issue_time_entries(start: datetime.datetime, end: datetime.datetime):
     return issues
 
 
+def send_notification(start, end, today, message):
+    """ 通知を送る """
+    dest = os.getenv('SEND_NOTIFYCATION')
+    if dest == 'sns':
+        period = '集計期間: {start}～{end}'.format(
+            start=start.strftime('%Y-%m-%d'),
+            end=end.strftime('%Y-%m-%d'),
+        )
+        sns_client = boto3.client('sns')
+        sns_client.publish(
+            TopicArn=os.getenv('SNS_TOPIC_ARN'),
+            Subject='【自動通知】{date}_稼働時間集計'.format(date=today.strftime('%Y%m%d')),
+            Message='{period}\n{message}'.format(period=period, message=message),
+        )
+    elif dest == 'chatwork':
+        requests.post('https://api.chatwork.com/v2/rooms/{room_id}/messages'.format(
+            room_id=os.getenv('CHATWORK_ROOM_ID'),
+        ), headers={
+            'X-ChatworkToken': os.getenv('CHATWORK_API_TOKEN'),
+        }, data={
+            'body': '[info][title]{subject}[/title]{message}[/info]'.format(
+                subject='稼働時間集計 ({start}-{end})'.format(start=start.strftime('%Y-%m-%d'), end=end.strftime('%Y-%m-%d')),
+                message=message,
+            ),
+        })
+    else:
+        app.log.info(message)
+
+
 @app.schedule(Cron(0, 0, '?', '*', 'MON', '*'))
 def lambda_handler(event, context={}):
     # 集計開始日・終了日を決定
     today = datetime.datetime.today()
     base_date = today
-    if os.environ.get('BASE_DATE'):
-        base_date = datetime.datetime.strptime(os.environ.get('BASE_DATE'), '%Y-%m-%d')
+    if os.getenv('BASE_DATE'):
+        base_date = datetime.datetime.strptime(os.getenv('BASE_DATE'), '%Y-%m-%d')
 
     # 基準日前日から BACK_DATE に設定した日数戻った日付までの期間を集計対象とする
     end = base_date - datetime.timedelta(days=1)
-    start = end - datetime.timedelta(days=int(os.environ.get('BACK_DATE', 6)))
+    start = end - datetime.timedelta(days=int(os.getenv('BACK_DATE', 6)))
 
     issues = get_issue_time_entries(start, end)
     clients = get_client_time_entries(issues)
 
-    period_message = '集計期間: {start}～{end}'.format(
-        start=start.strftime('%Y-%m-%d'),
-        end=end.strftime('%Y-%m-%d'),
-    )
-    messages = [period_message, '']
+    messages = []
     total = 0
     for name, hours in clients:
         messages.append('{name}: {hours}h'.format(name=name, hours=hours))
@@ -97,15 +122,7 @@ def lambda_handler(event, context={}):
     messages.append('合計: {hours}h'.format(hours=total))
 
     message = '\n'.join(messages)
-    if not app.debug:
-        # SNS へ連携
-        sns_client = boto3.client('sns')
-        sns_client.publish(
-            TopicArn=os.environ.get('SNS_TOPIC_ARN'),
-            Subject='【自動通知】{date}_稼働時間集計'.format(date=today.strftime('%Y%m%d')),
-            Message=message,
-        )
-    else:
-        app.log.info(message)
+
+    send_notification(start, end, today, message)
 
     return clients
