@@ -12,6 +12,7 @@
         "TZ": "Asia/Tokyo",
         "REDMINE_URL": "https://example.com/redmine",
         "REDMINE_KEY": "key",
+        "REDMINE_CUSTOM_FIELD_NAME": "client",
         "REDMINE_PROJECT": "project",
         "SNS_TOPIC_ARN": "arn:aws:sns:region:XXXXXXXXXXXX:name",
         "SEND_NOTIFYCATION": "chatwork",

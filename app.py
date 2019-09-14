@@ -16,13 +16,14 @@ def get_redmine_data(url: str, params: dict):
 
 
 def get_client_time_entries(issues: dict):
-    """ Issue 一覧から該当するクライアント単位の作業時間を取得 """
+    """ Issue 一覧から該当するカスタムフィールド単位の作業時間を取得 """
     params = {
         'key': os.getenv('REDMINE_KEY'),
         'issue_id': ','.join(map(str, issues.keys())),
         'status_id': '*',
     }
     url = urljoin(os.getenv('REDMINE_URL'), 'issues.json')
+    field_name = os.getenv('REDMINE_CUSTOM_FIELD_NAME', 'client')
     data = get_redmine_data(url, params)
     page = data['total_count'] // data['limit'] + 1
     clients = {}
@@ -31,7 +32,7 @@ def get_client_time_entries(issues: dict):
             params['offset'] = data['limit'] * p
             data = get_redmine_data(url, params)
         for r in data['issues']:
-            client = list(filter(lambda x: x['name'] == 'クライアント', r['custom_fields']))[0] or None
+            client = list(filter(lambda x: x['name'] == field_name, r['custom_fields']))[0] or None
             if not client:
                 continue
             hours = sum(issues[r['id']])
