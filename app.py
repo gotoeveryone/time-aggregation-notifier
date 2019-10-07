@@ -1,4 +1,5 @@
 import datetime
+import json
 import os
 from urllib.parse import urljoin
 import boto3
@@ -95,6 +96,14 @@ def send_notification(start, end, today, message):
                 message=message,
             ),
         })
+    elif dest == 'slack':
+        requests.post(os.getenv('SLACK_WEBHOOK_URL'), data=json.dumps({
+            'text': '{subject}\n```{message}```'.format(
+                subject='*稼働時間集計 ({start}-{end})*'.format(start=start.strftime('%Y-%m-%d'), end=end.strftime('%Y-%m-%d')),
+                message=message,
+            ),
+            'username': 'time-aggregation-notifier',
+        }))
     else:
         app.log.info(message)
 

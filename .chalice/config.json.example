@@ -15,9 +15,10 @@
         "REDMINE_CUSTOM_FIELD_NAME": "client",
         "REDMINE_PROJECT": "project",
         "SNS_TOPIC_ARN": "arn:aws:sns:region:XXXXXXXXXXXX:name",
-        "SEND_NOTIFYCATION": "chatwork",
+        "SEND_NOTIFYCATION": "slack",
         "CHATWORK_ROOM_ID": "XXXXXXX",
-        "CHATWORK_API_TOKEN": "XXXXXXX"
+        "CHATWORK_API_TOKEN": "XXXXXXX",
+        "SLACK_WEBHOOK_URL": "https://hooks.slack.com/services/XXXXXXX"
       }
     }
   }
