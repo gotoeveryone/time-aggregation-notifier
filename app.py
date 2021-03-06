@@ -73,7 +73,7 @@ def get_issue_time_entries(start: datetime.datetime, end: datetime.datetime):
 
 def send_notification(start, end, today, message):
     """ 通知を送る """
-    dest = os.getenv('SEND_NOTIFYCATION')
+    dest = os.getenv('SEND_NOTIFICATION')
     if dest == 'sns':
         period = '集計期間: {start}～{end}'.format(
             start=start.strftime('%Y-%m-%d'),
