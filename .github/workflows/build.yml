@@ -1,0 +1,96 @@
+name: Build
+
+on: [push]
+
+jobs:
+  code_check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+
+      - name: Setup pipenv
+        run: pip install pipenv
+
+      - name: Cache virtualenvs
+        uses: actions/cache@v1
+        id: app_cache
+        with:
+          path: ~/.local/share/virtualenvs
+          key: ${{ runner.OS }}-lib-${{ hashFiles('**/Pipfile.lock') }}
+
+      - name: Install dependencies
+        if: steps.app_cache.outputs.cache-hit != 'true'
+        run: pipenv install -d
+
+      - name: Execute code check
+        run: pipenv run code_check
+
+  deploy:
+    if: contains(github.ref, 'tags/v')
+    needs:
+      - code_check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+
+      - name: Setup pipenv
+        run: pip install pipenv
+
+      - name: Cache virtualenvs
+        uses: actions/cache@v1
+        id: app_cache
+        with:
+          path: ~/.local/share/virtualenvs
+          key: ${{ runner.OS }}-lib-${{ hashFiles('**/Pipfile.lock') }}
+
+      - name: Install dependencies
+        if: steps.app_cache.outputs.cache-hit != 'true'
+        run: pipenv install -d
+
+      - name: Generate config file
+        run: |
+          cat .chalice/config.json.example | \
+          jq -r ".stages.prod.iam_role_arn=\"${{ secrets.IAM_ROLE_ARN }}\"" | \
+          jq -r ".stages.prod.environment_variables.REDMINE_URL=\"${{ secrets.REDMINE_URL }}\"" | \
+          jq -r ".stages.prod.environment_variables.REDMINE_KEY=\"${{ secrets.REDMINE_KEY }}\"" | \
+          jq -r ".stages.prod.environment_variables.REDMINE_CUSTOM_FIELD_NAME=\"${{ secrets.REDMINE_CUSTOM_FIELD_NAME }}\"" | \
+          jq -r ".stages.prod.environment_variables.REDMINE_PROJECT=\"${{ secrets.REDMINE_PROJECT }}\"" | \
+          jq -r ".stages.prod.environment_variables.SNS_TOPIC_ARN=\"${{ secrets.SNS_TOPIC_ARN }}\"" | \
+          jq -r ".stages.prod.environment_variables.SLACK_WEBHOOK_URL=\"${{ secrets.SLACK_WEBHOOK_URL }}\"" > .chalice/config.json
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-1
+
+      - name: Deploy modules
+        run: pipenv run deploy
+
+  notify_slack:
+    if: ${{ always() && contains(github.ref, 'tags/v') }}
+    needs:
+      - deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: technote-space/workflow-conclusion-action@v1
+      - name: Notify to Slack
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ env.WORKFLOW_CONCLUSION }}
+          author_name: GitHub Actions
+          fields: repo,message,author,ref
+        env:
+          GITHUB_TOKEN: ${{ secrets.REPO_GITHUB_TOKEN }}
+          SLACK_WEBHOOK_URL: ${{ secrets.NOTIFY_SLACK_WEBHOOK_URL }}
