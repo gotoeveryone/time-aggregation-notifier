@@ -5,14 +5,14 @@ verify_ssl = true
 
 [dev-packages]
 autopep8 = "*"
+boto3 = "*"
 
 [packages]
-boto3 = "*"
 requests = "*"
 chalice = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.8"
 
 [scripts]
 execute = "python main.py"

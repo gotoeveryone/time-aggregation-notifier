@@ -4,17 +4,16 @@
 
 ## Requirements
 
-- Python 3.7
+- Python 3.8
 - pipenv
-- AWS account (use to dynamoDB and Lambda)
-- Chatwork or Slack account
+- AWS account (use to DynamoDB, Lambda and Systems Manager)
+- Slack account
 
 ## Setup
 
 ```console
 $ pipenv install # When with dev-package add `-d` option.
 $ cp .env.example .env # Please edit the value.
-$ cp event.json.example event.json # Please edit the value.
 ```
 
 ## Run (Local)
