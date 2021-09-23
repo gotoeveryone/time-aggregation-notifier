@@ -4,7 +4,7 @@
 
 ## Requirements
 
-- Python 3.7
+- Python 3.8
 - pipenv
 - AWS account (use to dynamoDB and Lambda)
 - Chatwork or Slack account
