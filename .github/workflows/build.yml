@@ -61,12 +61,8 @@ jobs:
         run: |
           cat .chalice/config.json.example | \
           jq -r ".stages.prod.iam_role_arn=\"${{ secrets.IAM_ROLE_ARN }}\"" | \
-          jq -r ".stages.prod.environment_variables.REDMINE_URL=\"${{ secrets.REDMINE_URL }}\"" | \
-          jq -r ".stages.prod.environment_variables.REDMINE_KEY=\"${{ secrets.REDMINE_KEY }}\"" | \
           jq -r ".stages.prod.environment_variables.REDMINE_CUSTOM_FIELD_NAME=\"${{ secrets.REDMINE_CUSTOM_FIELD_NAME }}\"" | \
-          jq -r ".stages.prod.environment_variables.REDMINE_PROJECT=\"${{ secrets.REDMINE_PROJECT }}\"" | \
-          jq -r ".stages.prod.environment_variables.SNS_TOPIC_ARN=\"${{ secrets.SNS_TOPIC_ARN }}\"" | \
-          jq -r ".stages.prod.environment_variables.SLACK_WEBHOOK_URL=\"${{ secrets.SLACK_WEBHOOK_URL }}\"" > .chalice/config.json
+          jq -r ".stages.prod.environment_variables.REDMINE_PROJECT=\"${{ secrets.REDMINE_PROJECT }}\"" > .chalice/config.json
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
