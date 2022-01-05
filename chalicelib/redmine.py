@@ -1,5 +1,6 @@
 from datetime import datetime
 import os
+from typing import Any
 from urllib.parse import urljoin
 
 import requests
@@ -13,7 +14,7 @@ class RedmineClient:
         self._project = os.getenv('REDMINE_PROJECT', 'job')
         self._custom_field_name = os.getenv('REDMINE_CUSTOM_FIELD_NAME', 'client')
 
-    def get_client_time_entries(self, issues: dict):
+    def get_client_time_entries(self, issues: dict) -> dict:
         """ Issue 一覧から該当するカスタムフィールド単位の作業時間を取得 """
         params = {
             'issue_id': ','.join(map(str, issues.keys())),
@@ -37,7 +38,7 @@ class RedmineClient:
         # 合計作業時間の降順でソート
         return sorted(clients.items(), key=lambda x: -x[1])
 
-    def get_issue_time_entries(self, start: datetime, end: datetime):
+    def get_issue_time_entries(self, start: datetime, end: datetime) -> dict:
         """ Issue 単位の作業時間を取得 """
         params = {
             'project': self._project,
@@ -63,7 +64,7 @@ class RedmineClient:
 
         return issues
 
-    def get_data(self, url: str, params: dict):
+    def get_data(self, url: str, params: dict) -> Any:
         """ Redmine の API から JSON 形式でデータを取得 """
         params.update({'key': self._key})
         res = requests.get(url, params)
