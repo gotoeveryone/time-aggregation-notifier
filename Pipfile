@@ -8,14 +8,14 @@ autopep8 = "*"
 boto3 = "*"
 
 [packages]
-requests = "*"
-chalice = "*"
+chalice = "~=1.26.3"
+requests = "~=2.26.0"
 
 [requires]
-python_version = "3.8"
+python_version = "3.9"
 
 [scripts]
-execute = "python main.py"
-deploy = "bash -c 'pipenv lock -r > requirements.txt && chalice deploy --stage prod'"
 code_check = "pycodestyle ."
 code_format = "autopep8 --in-place --recursive ."
+deploy = "bash -c 'pipenv lock -r > requirements.txt && chalice deploy --stage prod'"
+execute = "python main.py"
