@@ -5,23 +5,11 @@
 .idea
 .vscode
 
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
-
 # pyenv
-.python-version
+.go-version
 
 # Environments
 .env
-.venv
-
-# requirements.txt
-requirements.txt
-
-# Lambda config
-event.json
 
 # chalice
 .chalice/config.json
