@@ -4,36 +4,30 @@
 
 ## Requirements
 
-- Python 3.9
-- pipenv
+- Golang
 - AWS account (use to DynamoDB, Lambda and Systems Manager)
 - Slack account
 
 ## Setup
 
 ```console
-$ pipenv install # When with dev-package add `-d` option.
+$ go mod download
 $ cp .env.example .env # Please edit the value.
 ```
 
 ## Run (Local)
 
 ```console
-$ pipenv run execute
-```
-
-## Code check and format (with pycodestyle and autopep8)
-
-```console
-$ # Code check
-$ pipenv run code_check
-$ # Format
-$ pipenv run code_format
+$ go run src/main.go
 ```
 
 ## Deploy
 
+Use [lambroll](https://github.com/fujiwara/lambroll).
+
 ```console
-$ cp .chalice/config.json.example .chalice/config.json # Please edit the value.
-$ pipenv run deploy
+$ cp deploy/function.json.example deploy/function.json # Please edit the value.
+$ go build -o deploy/time-aggregation-notifier ./src/main.go
+$ cd deploy
+$ lambroll deploy
 ```
