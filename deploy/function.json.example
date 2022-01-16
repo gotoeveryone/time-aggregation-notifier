@@ -1,0 +1,15 @@
+{
+  "FunctionName": "time-aggregation-notifier",
+  "Handler": "time-aggregation-notifier",
+  "MemorySize": 128,
+  "Role": "arn:aws:iam::XXXXXXXX:role/XXX",
+  "Runtime": "go1.x",
+  "Timeout": 3,
+  "Environment": {
+    "Variables": {
+      "TZ": "Asia/Tokyo",
+      "IDENTIFIER": "project",
+      "GROUPING_NAME": "name"
+    }
+  }
+}

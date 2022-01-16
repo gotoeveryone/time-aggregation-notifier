@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/ssm"
 	"github.com/joho/godotenv"
@@ -14,24 +15,18 @@ import (
 	"gotoeveryone/time-aggregation-notifier/src/registry"
 )
 
-func main() {
-	// Initialize logger
-	logrus.SetFormatter(&logrus.JSONFormatter{})
+type MyEvent struct {
+	Name string `json:"name"`
+}
 
-	// Load dotenv
-	if err := godotenv.Load(); err != nil {
-		logrus.Error(err)
-		os.Exit(1)
-	}
-
+func HandleRequest(ctx context.Context, name MyEvent) (string, error) {
 	// 集計開始日・終了日を決定
 	specifyDate := os.Getenv("BASE_DATE")
 	baseDate := time.Now()
 	var err error
 	if specifyDate != "" {
 		if baseDate, err = time.Parse("2006-01-02", specifyDate); err != nil {
-			os.Exit(1)
-			return
+			return "", err
 		}
 	}
 
@@ -45,36 +40,55 @@ func main() {
 
 	cfg, err := config.LoadDefaultConfig(context.TODO())
 	if err != nil {
-		logrus.Error(err)
-		os.Exit(1)
+		return "", err
 	}
 	ssmClient := ssm.NewFromConfig(cfg)
 
 	// 集計を実施
 	tec, err := registry.NewTimeEntryClient(*ssmClient)
 	if err != nil {
-		logrus.Error(err)
-		os.Exit(1)
+		return "", err
 	}
 	res, err := tec.Get(os.Getenv("IDENTIFIER"), start, end)
 	if err != nil {
-		logrus.Error(err)
-		os.Exit(1)
+		return "", err
 	}
 	summary, err := tec.GetGroupedBy(os.Getenv("GROUPING_NAME"), res)
 	if err != nil {
-		logrus.Error(err)
-		os.Exit(1)
+		return "", err
 	}
 
 	// 集計結果を通知
 	nc, err := registry.NewNotifyClient(*ssmClient)
 	if err != nil {
-		logrus.Error(err)
-		os.Exit(1)
+		return "", err
 	}
 	if err := nc.Notify(start, end, summary); err != nil {
-		logrus.Error(err)
-		os.Exit(1)
+		return "", err
 	}
+
+	return "success", nil
+}
+
+func main() {
+	if os.Getenv("DEBUG") == "1" {
+		// Initialize logger
+		logrus.SetFormatter(&logrus.JSONFormatter{})
+
+		// Load dotenv
+		if err := godotenv.Load(); err != nil {
+			logrus.Error(err)
+			os.Exit(1)
+		}
+
+		res, err := HandleRequest(context.TODO(), MyEvent{Name: "debug"})
+		if err != nil {
+			logrus.Error(err)
+			os.Exit(1)
+		}
+		logrus.Info(res)
+		return
+	}
+
+	lambda.Start(HandleRequest)
 }

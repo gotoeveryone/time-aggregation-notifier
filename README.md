@@ -23,7 +23,11 @@ $ go run src/main.go
 
 ## Deploy
 
+Use [lambroll](https://github.com/fujiwara/lambroll).
+
 ```console
-$ cp .chalice/config.json.example .chalice/config.json # Please edit the value.
-$ pipenv run deploy
+$ cp deploy/function.json.example deploy/function.json # Please edit the value.
+$ go build -o deploy/time-aggregation-notifier ./src/main.go
+$ cd deploy
+$ lambroll deploy
 ```
