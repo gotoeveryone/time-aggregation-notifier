@@ -40,31 +40,22 @@ func HandleRequest(ctx context.Context, name MyEvent) (string, error) {
 
 	cfg, err := config.LoadDefaultConfig(context.TODO())
 	if err != nil {
-		return "", err
+		return "failed", err
 	}
 	ssmClient := ssm.NewFromConfig(cfg)
 
-	// 集計を実施
 	tec, err := registry.NewTimeEntryClient(*ssmClient)
 	if err != nil {
-		return "", err
+		return "failed", err
 	}
-	res, err := tec.Get(os.Getenv("IDENTIFIER"), start, end)
-	if err != nil {
-		return "", err
-	}
-	summary, err := tec.GetGroupedBy(os.Getenv("GROUPING_NAME"), res)
-	if err != nil {
-		return "", err
-	}
-
-	// 集計結果を通知
 	nc, err := registry.NewNotifyClient(*ssmClient)
 	if err != nil {
-		return "", err
+		return "failed", err
 	}
-	if err := nc.Notify(start, end, summary); err != nil {
-		return "", err
+
+	usecase := registry.NewSummarizeUsecase(tec, nc)
+	if err := usecase.Exec(start, end); err != nil {
+		return "failed", err
 	}
 
 	return "success", nil

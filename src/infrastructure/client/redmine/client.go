@@ -23,7 +23,7 @@ type timeEntryClient struct {
 	key    string
 }
 
-func NewTimeEntryClient(c ssm.Client) (client.TimeEntryClient, error) {
+func NewTimeEntryClient(c ssm.Client) (client.TimeEntry, error) {
 	url, err := helper.GetParameter(c, "redmine_url")
 	if err != nil {
 		return nil, err
@@ -52,7 +52,11 @@ func (c *timeEntryClient) Get(identifier string, start time.Time, end time.Time)
 		return nil, err
 	}
 
-	pageCount := s.TotalCount/s.Limit + 1
+	pageCount := 1
+	if s.Limit < s.TotalCount {
+		pageCount = s.TotalCount/s.Limit + 1
+	}
+
 	issues := map[int][]float32{}
 	for page := 1; page <= pageCount; page++ {
 		if page > 1 {
@@ -93,7 +97,11 @@ func (c *timeEntryClient) GetGroupedBy(name string, timeEntires []entity.TimeEnt
 		return nil, err
 	}
 
-	pageCount := s.TotalCount/s.Limit + 1
+	pageCount := 1
+	if s.Limit < s.TotalCount {
+		pageCount = s.TotalCount/s.Limit + 1
+	}
+
 	values := []entity.Summary{}
 	for page := 1; page <= pageCount; page++ {
 		if page > 1 {

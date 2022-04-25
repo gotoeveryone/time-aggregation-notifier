@@ -21,7 +21,7 @@ type notificationClient struct {
 	url    string
 }
 
-func NewNotificationClient(c ssm.Client) (client.NotificationClient, error) {
+func NewNotificationClient(c ssm.Client) (client.Notification, error) {
 	url, err := helper.GetParameter(c, "slack_time_aggregation_notifier_webhook_url")
 	if err != nil {
 		return nil, err
@@ -33,7 +33,7 @@ func NewNotificationClient(c ssm.Client) (client.NotificationClient, error) {
 	}, nil
 }
 
-func (c *notificationClient) Notify(start time.Time, end time.Time, summary []entity.Summary) error {
+func (c *notificationClient) Exec(start time.Time, end time.Time, summary []entity.Summary) error {
 	messages := []string{}
 	var total float32
 	for _, v := range summary {

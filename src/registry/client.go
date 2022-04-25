@@ -9,11 +9,11 @@ import (
 )
 
 // NewTimeEntryClient creates a client that aggregates by the hour
-func NewTimeEntryClient(c ssm.Client) (client.TimeEntryClient, error) {
+func NewTimeEntryClient(c ssm.Client) (client.TimeEntry, error) {
 	return redmine.NewTimeEntryClient(c)
 }
 
 // NewNotifyClient is creates a client that notifications of summary
-func NewNotifyClient(c ssm.Client) (client.NotificationClient, error) {
+func NewNotifyClient(c ssm.Client) (client.Notification, error) {
 	return slack.NewNotificationClient(c)
 }
