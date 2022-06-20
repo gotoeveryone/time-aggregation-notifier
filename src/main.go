@@ -9,7 +9,6 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/ssm"
-	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 
 	"gotoeveryone/time-aggregation-notifier/src/registry"
@@ -65,12 +64,6 @@ func main() {
 	if os.Getenv("DEBUG") == "1" {
 		// Initialize logger
 		logrus.SetFormatter(&logrus.JSONFormatter{})
-
-		// Load dotenv
-		if err := godotenv.Load(); err != nil {
-			logrus.Error(err)
-			os.Exit(1)
-		}
 
 		res, err := HandleRequest(context.TODO(), MyEvent{Name: "debug"})
 		if err != nil {

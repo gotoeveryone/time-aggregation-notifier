@@ -4,21 +4,15 @@
 
 ## Requirements
 
-- Golang
+- Docker
 - AWS account (use to DynamoDB, Lambda and Systems Manager)
 - Slack account
 
-## Setup
+## Setup & Run
 
 ```console
-$ go mod download
 $ cp .env.example .env # Please edit the value.
-```
-
-## Run (Local)
-
-```console
-$ go run src/main.go
+$ docker compose up
 ```
 
 ## Deploy

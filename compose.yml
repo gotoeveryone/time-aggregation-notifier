@@ -1,0 +1,15 @@
+services:
+  app:
+    image: golang:1.17-alpine
+    env_file: .env
+    environment:
+      DEBUG: 1
+      TZ: "Asia/Tokyo"
+    volumes:
+      - ./:/var/app
+      - go_cache:/go
+    working_dir: /var/app
+    command: /bin/sh -c "go mod download && go run src/main.go"
+
+volumes:
+  go_cache:

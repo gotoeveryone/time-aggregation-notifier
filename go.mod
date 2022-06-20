@@ -8,7 +8,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.13.0
 	github.com/aws/aws-sdk-go-v2/service/ssm v1.20.0
 	github.com/jarcoal/httpmock v1.1.0
-	github.com/joho/godotenv v1.4.0
 	github.com/sirupsen/logrus v1.8.1
 )
 
