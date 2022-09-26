@@ -5,8 +5,8 @@
 .idea
 .vscode
 
-# pyenv
-.go-version
+# asdf
+.tool-versions
 
 # Environments
 .env

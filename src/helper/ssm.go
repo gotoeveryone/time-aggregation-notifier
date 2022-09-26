@@ -10,7 +10,7 @@ import (
 func GetParameter(c ssm.Client, name string) (*string, error) {
 	o, err := c.GetParameter(context.TODO(), &ssm.GetParameterInput{
 		Name:           aws.String(name),
-		WithDecryption: true,
+		WithDecryption: aws.Bool(true),
 	})
 	if err != nil {
 		return nil, err
