@@ -6,15 +6,15 @@ jobs:
   code_check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
 
       - name: Set up Golang
-        uses: actions/setup-go@v1
+        uses: actions/setup-go@v3
         with:
           go-version: 1.19
 
       - name: Use Cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: app_cache
         with:
           path: ~/go/pkg/mod
@@ -30,15 +30,15 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
 
       - name: Set up Golang
-        uses: actions/setup-go@v1
+        uses: actions/setup-go@v3
         with:
           go-version: 1.19
 
       - name: Use Cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: app_cache
         with:
           path: ~/go/pkg/mod
@@ -58,15 +58,15 @@ jobs:
       - test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
 
       - name: Set up Golang
-        uses: actions/setup-go@v1
+        uses: actions/setup-go@v3
         with:
           go-version: 1.19
 
       - name: Use Cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: app_cache
         with:
           path: ~/go/pkg/mod
@@ -90,7 +90,7 @@ jobs:
           jq -r ".Environment.Variables.GROUPING_NAME=\"${{ secrets.GROUPING_NAME }}\"" > deploy/function.json
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -110,7 +110,7 @@ jobs:
       - deploy
     runs-on: ubuntu-latest
     steps:
-      - uses: technote-space/workflow-conclusion-action@v1
+      - uses: technote-space/workflow-conclusion-action@v3
       - name: Notify to Slack
         uses: 8398a7/action-slack@v3
         with:
