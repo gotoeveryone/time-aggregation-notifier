@@ -9,7 +9,7 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/ssm"
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 
 	"gotoeveryone/time-aggregation-notifier/src/registry"
 )
@@ -62,15 +62,11 @@ func HandleRequest(ctx context.Context, name MyEvent) (string, error) {
 
 func main() {
 	if os.Getenv("DEBUG") == "1" {
-		// Initialize logger
-		logrus.SetFormatter(&logrus.JSONFormatter{})
-
-		res, err := HandleRequest(context.TODO(), MyEvent{Name: "debug"})
+		res, err := HandleRequest(context.Background(), MyEvent{Name: "debug"})
 		if err != nil {
-			logrus.Error(err)
-			os.Exit(1)
+			log.Fatal().Err(err).Msg("")
 		}
-		logrus.Info(res)
+		log.Info().Msg(res)
 		return
 	}
 
