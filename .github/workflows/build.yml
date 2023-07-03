@@ -83,6 +83,7 @@ jobs:
         env:
           GOOS: linux
           GOARCH: amd64
+          CGO_ENABLED: 0
         run: go build -o deploy/time-aggregation-notifier ./src/main.go
 
       - name: Generate config file
