@@ -6,7 +6,7 @@ require (
 	github.com/aws/aws-lambda-go v1.41.0
 	github.com/aws/aws-sdk-go-v2 v1.21.0
 	github.com/aws/aws-sdk-go-v2/config v1.18.36
-	github.com/aws/aws-sdk-go-v2/service/ssm v1.37.4
+	github.com/aws/aws-sdk-go-v2/service/ssm v1.37.5
 	github.com/jarcoal/httpmock v1.3.1
 	github.com/rs/zerolog v1.30.0
 )
