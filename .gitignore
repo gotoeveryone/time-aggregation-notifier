@@ -12,5 +12,5 @@
 .env
 
 # rambroll
+deploy/bootstrap
 deploy/function.json
-deploy/time-aggregation-notifier
