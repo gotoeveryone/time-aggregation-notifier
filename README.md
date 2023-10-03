@@ -21,7 +21,7 @@ Use [lambroll](https://github.com/fujiwara/lambroll).
 
 ```console
 $ cp deploy/function.json.example deploy/function.json # Please edit the value.
-$ go build -o deploy/time-aggregation-notifier ./src/main.go
+$ GOARCH=amd64 GOOS=linux CGO_ENABLED=0 go build -tags lambda.norpc -o deploy/bootstrap ./src/main.go
 $ cd deploy
 $ lambroll deploy
 ```
