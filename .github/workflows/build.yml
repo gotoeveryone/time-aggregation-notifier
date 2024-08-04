@@ -2,30 +2,18 @@ name: Build
 
 on: [push]
 
-env:
-  cache-version: v1
-
 jobs:
   code_check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Golang
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v5
         with:
           go-version: "1.20"
-
-      - name: Use Cache
-        uses: actions/cache@v3
-        id: app_cache
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ env.cache-version }}-${{ runner.OS }}-${{ hashFiles('**/go.sum') }}
-
-      - name: Install dependencies
-        if: steps.app_cache.outputs.cache-hit != 'true'
-        run: go mod download
+          cache-dependency-path: |
+            **/go.sum
 
       - name: Execute code check
         run: go vet ./...
@@ -33,25 +21,16 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Golang
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v5
         with:
           go-version: "1.20"
+          cache-dependency-path: |
+            **/go.sum
 
-      - name: Use Cache
-        uses: actions/cache@v3
-        id: app_cache
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ env.cache-version }}-${{ runner.OS }}-${{ hashFiles('**/go.sum') }}
-
-      - name: Install dependencies
-        if: steps.app_cache.outputs.cache-hit != 'true'
-        run: go mod download
-
-      - name: Execute code check
+      - name: Execute test
         run: go test ./...
 
   deploy:
@@ -61,23 +40,14 @@ jobs:
       - test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Golang
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v5
         with:
           go-version: "1.20"
-
-      - name: Use Cache
-        uses: actions/cache@v3
-        id: app_cache
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ env.cache-version }}-${{ runner.OS }}-${{ hashFiles('**/go.sum') }}
-
-      - name: Install dependencies
-        if: steps.app_cache.outputs.cache-hit != 'true'
-        run: go mod download
+          cache-dependency-path: |
+            **/go.sum
 
       - name: Build
         env:
@@ -94,15 +64,15 @@ jobs:
           jq -r ".Environment.Variables.GROUPING_NAME=\"${{ secrets.GROUPING_NAME }}\"" > deploy/function.json
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1-node16
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-1
 
-      - uses: fujiwara/lambroll@v0
+      - uses: fujiwara/lambroll@v1
         with:
-          version: v0.12.7
+          version: v1.0.5
 
       - name: Deploy
         working-directory: deploy
