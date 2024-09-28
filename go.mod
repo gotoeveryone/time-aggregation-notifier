@@ -1,6 +1,6 @@
 module gotoeveryone/time-aggregation-notifier
 
-go 1.20
+go 1.21
 
 require (
 	github.com/aws/aws-lambda-go v1.47.0
