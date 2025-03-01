@@ -8,6 +8,9 @@
 # asdf
 .tool-versions
 
+# mise
+mise.toml
+
 # Environments
 .env
 

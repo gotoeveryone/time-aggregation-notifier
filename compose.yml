@@ -1,6 +1,6 @@
 services:
   app:
-    image: golang:1.21-alpine
+    image: golang:1.22-alpine
     env_file: .env
     environment:
       DEBUG: 1
